@@ -1,71 +1,74 @@
 /* Java script*/
-let element = (id) => document.getElementById(id);
-let classes = (classes) => document.getElementsByClassName(classes);
-let form2=document.getElementById("form");
-var user_entry=[];
-const retrive_user_entries=()=>{
-    let entries=localStorage.getItem("user_entry");
-    if(entries)
-    {
-        entries=JSON.parse(entries)
+let userForm = document.getElementById("user-form");
+var UserEntries = [];
 
-    }
-    else{
-        entries=[];
-    }
-    return entries;
+let errors = [];
+const retieveEntries = () => {
+  let entries = localStorage.getItem("UserEntries");
+  if (entries) {
+    entries = JSON.parse(entries);
+  } else {
+    entries = [];
+  }
+  return entries;
+};
+const displayEntries = () => {
+  let entries = retieveEntries();
+  const tbleEntries = entries
+     .map((entry) => {
+      const nameCell = `<td class='border px-5 py-2'>${entry.name}</td>`;
+      const emailCell = `<td class='border px-5 py-2'>${entry.email}</td>`;
+      const passwordCell = `<td class='border px-5 py-2'>${entry.password}</td>`;
+      const dobCell = `<td class='border px-5 py-2'>${entry.dob}</td>`;
+      const acceptTermsCell = `<td class='border px-4 py-2'>${entry.acceptTerms}</td>`;
+      const row = `<tr>${nameCell} ${emailCell} ${passwordCell} ${dobCell} ${acceptTermsCell}</tr>`;
+      return row;
+    })
+    .join("\n");
+  const table = ` <table class='table-auto w-full'>
+    <tr>
+    <th class='px-4 py-2 '>Name </th>
+    <th class='px-4 py-2 '>Email </th>
+    <th class='px-4 py-2 '>Password </th>
+    <th class='px-4 py-2 '>Dob </th>
+    <th class='px-4 py-2 '>Accepted terms? </th>
+    </tr>${tbleEntries}
+</table>`;
+  let details = document.getElementById("user-entries");
+  details.innerHTML = table;
 };
 
-const displayEntry=()=>{
-
-    //let table = element("user-table");
-    let entries = retrive_user_entries();
-   
-    const tentry=entries.map((entry)=>{
-        const name='<td>${entry.name}</td>';
-        const email='<td>${entry.email}</td>';
-        const password='<td>${entry.password}</td>';
-        const dob ='<td>${entry.dob}</td>';
-        const termc='<td>${entry.termc}</td>';
-        const record='<tr>${name} ${email}   ${password}    ${dob} ${termc} </tr> ';
-        return record;
-    }).join("\n");
-   const table1=' <table><tr> <th>UserName</th> <th>Email</th> <th>Password</th>  <th>Date of Birth</th> <th>Accepted term</th> </tr>${tentry} </table>';
-     let details=document.getElementById("user_entry");
-     details.innerHTML=table1;
-};
-const saveform=(event)=>{
-    event.preventDefault();
-    const name=document.getElementById("name").value;
-    const email=document.getElementById("email").value;             
-    const password=document.getElementById("password").value;
-    const dob=document.getElementById("dob").value;
-    const termc=document.getElementById("termc").checked;
-
-    let currentYear= new Date().getFullYear();
-    let dateofbirth =dob.split("-")[0];
-    let byear = dateofbirth[0];
-    let age =  (currentYear - byear)
-    console.log({ age, currentYear, byear });
+const saveUserForm = (event) => {
+  event.preventDefault();
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const dob = document.getElementById("dob").value;
+  const acceptTerms = document.getElementById("acceptTerms").checked;
+  var currentYear = new Date().getFullYear();
+  var birthYear = dob.split("-");
+  let year = birthYear[0];
+  var age = currentYear - year;
+  console.log({ age, currentYear, birthYear });
   if (age < 18 || age > 55) {
     document.getElementById("dob").style = "border:1px solid red";
     return alert("Your age must be under 18 and 55 years");
   } else {
     document.getElementById("dob").style = "border:none";
-      const entry={
-        name,
-        email,
-        password,
-        dob,
-        termc
+
+    const entry = {
+      name,
+      email,
+      password,
+      dob,
+      acceptTerms,
     };
-    user_entry = retrive_user_entries();
-    user_entry.push(entry);
-    localStorage.setItem("user_entry", JSON.stringify(user_entry));
-    displayEntry();
-    form2.reset();
+    UserEntries = retieveEntries();
+    UserEntries.push(entry);
+    localStorage.setItem("UserEntries", JSON.stringify(UserEntries));
+    displayEntries();
+    userForm.reset();
   }
 };
-form2.addEventListener("submit",saveform);
-displayEntry();
-
+userForm.addEventListener("submit", saveUserForm);
+displayEntries();
